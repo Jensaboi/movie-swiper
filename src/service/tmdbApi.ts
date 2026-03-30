@@ -1,4 +1,4 @@
-const JWT_TOKEN = import.meta.env.VITE_TMDB_JWT;
+const ACCESS_TOKEN = import.meta.env.VITE_TMDB_JWT;
 const BASE_URL = "https://api.themoviedb.org/3";
 
 export async function getMedia({ media }: { media: string }) {
@@ -6,7 +6,7 @@ export async function getMedia({ media }: { media: string }) {
     method: "GET",
     headers: {
       accept: "application/json",
-      Authorization: `Bearer ${JWT_TOKEN}`,
+      Authorization: `Bearer ${ACCESS_TOKEN}`,
     },
   });
 
@@ -24,7 +24,7 @@ export async function getGenres({ media }: { media: string }) {
     method: "GET",
     headers: {
       accept: "application/json",
-      Authorization: `Bearer ${JWT_TOKEN}`,
+      Authorization: `Bearer ${ACCESS_TOKEN}`,
     },
   });
 
