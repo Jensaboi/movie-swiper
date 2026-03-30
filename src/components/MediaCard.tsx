@@ -21,9 +21,20 @@ export default function MediaCard({
   voteAverage,
   voteCount,
 }: MediaCardProps) {
+  function handleSwipe(e) {
+    const clientX = e.touches[0].clientX;
+    console.log(clientX);
+  }
+
   return (
     <article className="media-card">
-      <img alt={`Poster of ${name}`} src={IMG_BASE_URL + posterPath} />
+      <div>
+        <img
+          onTouchMove={handleSwipe}
+          alt={`Poster of ${name}`}
+          src={IMG_BASE_URL + posterPath}
+        />
+      </div>
     </article>
   );
 }
