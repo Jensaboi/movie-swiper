@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getMedia } from "./service/tmdbApi";
 import MediaCard from "./components/MediaCard";
 import type { JSX } from "react";
@@ -10,41 +10,35 @@ function App(): JSX.Element {
   const [selected, setSelected] = useState<any[]>([]);
   const page = Math.floor(index / 20) + 1;
 
-  const { data, isLoading, isError, error } = useQuery({
+  const {
+    data,
+    error,
+    isFetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ["media", page],
+    initialPageParam: 1,
     queryFn: () => getMedia({ media: "movie", page }),
+    getNextPageParam: lastPage => lastPage,
   });
-  const queryClient = useQueryClient();
 
-  const modIndex = index % data?.length;
+  console.log(data);
+
+  const modIndex = index % 20;
 
   useEffect(() => {
-    if (modIndex === 15) {
-      const preFetchMedia = async () => {
-        try {
-          const data = await queryClient.fetchQuery({
-            queryKey: ["media", page + 1],
-            queryFn: () => getMedia({ media: "movie", page: page + 1 }),
-          });
-          console.log(data);
-          queryClient.setQueryData(["media", page + 1], old => [
-            ...old,
-            ...data,
-          ]);
-        } catch (err) {
-          console.log(err);
-        }
-      };
-
-      preFetchMedia();
+    if (modIndex === 16) {
+      fetchNextPage();
     }
   }, [modIndex]);
 
-  if (isLoading) return <h2>loading</h2>;
+  if (isFetching) return <h2>loading</h2>;
 
-  if (isError) return <h2>Error </h2>;
+  if (error) return <h2>Error </h2>;
 
-  const currentMedia = data[index];
+  const currentMedia = data?.pages?.[page - 1][index];
 
   function handleSwipeRight() {
     setSelected(prev => [...prev, currentMedia]);
