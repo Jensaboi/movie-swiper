@@ -1,7 +1,7 @@
 import { useState, type JSX } from "react";
+
 type MediaCardProps = {
   name: string;
-  backdropPath: string;
   genreIds: number[];
   id: number;
   overview: string;
@@ -9,7 +9,9 @@ type MediaCardProps = {
   voteAverage: number;
   voteCount: number;
   posterPath: string;
-  setIndex: (prev: number) => void;
+  backdropPath: string;
+  handleSwipeRight: () => void;
+  handleSwipeLeft: () => void;
 };
 
 const IMG_BASE_URL = "https://image.tmdb.org/t/p/w780";
@@ -17,12 +19,14 @@ const IMG_BASE_URL = "https://image.tmdb.org/t/p/w780";
 export default function MediaCard({
   name,
   posterPath,
+  backdropPath,
   id,
   overview,
   releaseDate,
   voteAverage,
   voteCount,
-  setIndex,
+  handleSwipeLeft,
+  handleSwipeRight,
 }: MediaCardProps): JSX.Element {
   const [startPos, setStartPos] = useState<number | null>(null);
 
@@ -39,15 +43,19 @@ export default function MediaCard({
     const SWIPE_LENGTH = 150;
 
     if (currPos - SWIPE_LENGTH > startPos) {
-      console.log("right");
+      //right swipe
       setStartPos(null);
-      setIndex((prev: number) => prev + 1);
+      handleSwipeRight();
     } else if (currPos + SWIPE_LENGTH < startPos) {
-      console.log("left");
+      //left swipe
       setStartPos(null);
-      setIndex((prev: number) => prev + 1);
+      handleSwipeLeft();
     }
   }
+
+  const img = posterPath
+    ? IMG_BASE_URL + posterPath
+    : IMG_BASE_URL + backdropPath;
 
   return (
     <article className="media-card">
@@ -55,7 +63,7 @@ export default function MediaCard({
         onTouchStart={handleSetStartingPos}
         onTouchMove={handleSwipe}
         alt={`Poster of ${name}`}
-        src={IMG_BASE_URL + posterPath}
+        src={img}
       />
     </article>
   );

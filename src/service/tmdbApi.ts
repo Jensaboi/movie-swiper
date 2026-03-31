@@ -1,8 +1,14 @@
 const ACCESS_TOKEN = import.meta.env.VITE_TMDB_JWT;
 const BASE_URL = "https://api.themoviedb.org/3";
 
-export async function getMedia({ media }: { media: string }) {
-  const res = await fetch(`${BASE_URL}/${media}/popular`, {
+export async function getMedia({
+  media,
+  page = 1,
+}: {
+  media: string;
+  page: number;
+}) {
+  const res = await fetch(`${BASE_URL}/${media}/popular?page=${page}`, {
     method: "GET",
     headers: {
       accept: "application/json",
