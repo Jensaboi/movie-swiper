@@ -8,7 +8,6 @@ import SwipeButtons from "./components/SwipeButtons";
 function App(): JSX.Element {
   const [index, setIndex] = useState<number>(0);
   const [selected, setSelected] = useState<any[]>([]);
-  const page = Math.floor(index / 20) + 1;
 
   const {
     data,
@@ -18,13 +17,11 @@ function App(): JSX.Element {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["media", page],
+    queryKey: ["media"],
     initialPageParam: 1,
-    queryFn: () => getMedia({ media: "movie", page }),
-    getNextPageParam: lastPage => lastPage,
+    queryFn: ({ pageParam }) => getMedia({ media: "movie", page: pageParam }),
+    getNextPageParam: (lastPage, allPages) => allPages.length + 1,
   });
-
-  console.log(data);
 
   const modIndex = index % 20;
 
@@ -38,7 +35,14 @@ function App(): JSX.Element {
 
   if (error) return <h2>Error </h2>;
 
-  const currentMedia = data?.pages?.[page - 1][index];
+  if (!data) return <h2>Error</h2>;
+
+  const allMedia = data.pages.flat() ?? [];
+
+  const currentMedia = allMedia[index];
+  const nextMediaImgPath = allMedia[index + 1]?.poster_path
+    ? allMedia[index + 1].poster_path
+    : allMedia[index + 1].backdrop_path;
 
   function handleSwipeRight() {
     setSelected(prev => [...prev, currentMedia]);
@@ -49,18 +53,14 @@ function App(): JSX.Element {
     setIndex(index + 1);
   }
 
+  console.log(selected);
   return (
     <main>
       <MediaCard
         name={currentMedia?.title}
         posterPath={currentMedia?.poster_path}
         backdropPath={currentMedia?.backdrop_path}
-        id={currentMedia?.id}
-        overview={currentMedia?.overview}
-        releaseDate={currentMedia?.release_date}
-        voteAverage={currentMedia?.vote_average}
-        voteCount={currentMedia?.vote_count}
-        genreIds={currentMedia?.genre_ids}
+        nextMediaImgPath={nextMediaImgPath}
         handleSwipeRight={handleSwipeRight}
         handleSwipeLeft={handleSwipeLeft}
       />
